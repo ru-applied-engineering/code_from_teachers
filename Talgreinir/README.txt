@@ -12,7 +12,8 @@ Prufukóði: tal_stream_test.py
 
 3. Setja lykil sem breytu í Linux
 	export TALA_API_KEY=ak_BAj1dO47QmyPvkDKZ4GBq628OpALW9weW1nXaEN7oj5geYzrdRJV1lM0bmDlK5Lr
-	Þessi breyta tapast þegar Linux er endurræst
+	Þessi breyta tapast þegar Linux er endurræst en það er hægt að festa hana inni með því að
+	bæta ofangreindri skipun neðst í skrána ~/.profile -> nano ~/.profile.
 
 4. Opna python koðann
 	python3 tal_stream_test.py /bla  (Ath: /bla þarf að vera eins og er, gerir samt ekki neitt)
