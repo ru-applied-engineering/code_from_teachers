@@ -1,6 +1,6 @@
 
 To change the clock frequency to 8MHz write the following command in terminal:
 
-> sudo avrdude -c linuxgpio -p atmega328p -v -U lfuse:w:0xE2:m
+sudo avrdude -c linuxgpio -p atmega328p -v -U lfuse:w:0xE2:m
 
 Note: After changing the clock frequency the old code will not work correctly.
