@@ -163,53 +163,9 @@ ISR (USART_RX_vect)
      ser_buff_index = 0;
   }
   
-  /*
-  ser_cmd[ser_cmd_count] = UDR0;
-  ser_cmd_count += 1;
-  if(ser_cmd_count == 3){
-    //ser_cmd[3] = 0;  //End of cmd string
-    ser_cmd_count = 0;
-    ser_new_cmd = 1;
-    
-    
-  }
-  */
-
-  /*
-  switch(ser_cmd_count){
-    case 0:
-      ser_motor_L_R_char = UDR0;
-      ser_cmd_count++;
-      ser_data[0] = UDR0;
-    break;
-
-    case 1:
-      ser_motor_direction_char = UDR0;
-      ser_cmd_count += 1;
-      ser_data[1] = UDR0;
-    break;
-
-    case 2:
-      ser_motor_duty = UDR0;
-      ser_data[2] = UDR0;
-      ser_data[3] = '\n';
-      ser_data[4] = '\0';
-      ser_cmd_count = 0;
-      ser_new_cmd = 1;
-    break;
-
-    
-  }
-  
-    */
-  
-
 
 }
 
-
-#define P1H_PWM_INV COM0A0  //PD6
-#define P2H_PWM_INV COM0B0  //PD5
 
 
 //Initalizing motors
@@ -286,11 +242,12 @@ void SET_L_dir_duty(uint8_t dir, uint8_t duty_perc_s){  //Forward: 1; Reverse: 0
     PWM1_LOW;
     
   }
-  if(dir == 0){    
+  if(dir == 0){   
+    //Reverse 
     TCCR0A |= ((1 << COM0B1));
     TCCR0A &= ~((1 << COM0A1) | (1 << COM0A0));
     OCR0B = duty_tmp;
-    AENBL_LOW; //Reverse
+    AENBL_LOW; 
     
   }
 }
@@ -307,6 +264,7 @@ void SET_R_dir_duty(uint8_t dir, uint8_t duty_perc_s){  //Forward: 1; Reverse: 0
 
   }
   if(dir == 0){
+    //Reverse
     TCCR1A &= ~((1 << COM1A1) | (1 << COM1A0));
     TCCR1A |= ((1 << COM1B1));
     OCR1B = duty_tmp;
@@ -343,14 +301,13 @@ char* check_for_new_cmd(char *data_in){
   
   //Check if new command is arriving
   if(!ser_rx_cmd && (strstr(data_in, cmd_start))){
-    LED_HIGH;
+
     ser_rx_cmd = 1;
     return 0;
   }
+
   //Check if cmd has arrived
   if(ser_rx_cmd && (strstr(data_in, cmd_stop))){
-    //LED_HIGH;
-
 
     char* tmp_cmd_begins = strstr(data_in, cmd_start) + cmd_marker_length; //Cmd starts after second start char.
     
@@ -371,15 +328,14 @@ char* check_for_new_cmd(char *data_in){
     ser_data[0] = 0;
 
     return tmp_cmd;  //return the cmd.
-    
-    
   }
+  
   return 0;
   
 }
 
 
-//char tx_array[10] = {'A','B','C','D','\n','\0'};
+
 int main()
 {
 	init_motor_driver();
@@ -387,50 +343,19 @@ int main()
   memset(ser_data, 0, SER_BUFFER_SIZE-1); //Delete all data in cmd buffer
   
 
-  /*SET_L_dir(1);
-  SET_R_dir(1);
-  SET_R_duty(100);
-  SET_L_duty(100);*/
   
   ser_data[0] = 0;
   char* cmd_buffer_tmp;
   uint8_t m_direction = 255;
+  char* ptr;
   while(1) {
 
-    
-    /*
-    if(print_ser == 1){
-      print_ser = 0;
-      UART_Transmit_String(ser_data);
-    }
-    */
-    /*
     if(cmd_buffer_tmp = check_for_new_cmd(ser_data)){
-      UART_Transmit_String(cmd_buffer_tmp);
-      free(cmd_buffer_tmp);
-    }
-    */  
-
-   // SET_R_dir(0);
-   // SET_R_duty(70);
-   //SET_L_dir_duty(0, 40);
-   //SET_R_dir_duty(0, 40);
-      
-    
-
-    
-
-    char* ptr;
-    
-    if(cmd_buffer_tmp = check_for_new_cmd(ser_data)){
-      
-      
-      
       
       ser_motor_L_R_char = cmd_buffer_tmp[0];
       ser_motor_direction_char = cmd_buffer_tmp[1];
       ser_motor_duty = (uint8_t)strtol(&cmd_buffer_tmp[2], &ptr, 10);
-      UART_Transmit_String(cmd_buffer_tmp);
+      //UART_Transmit_String(cmd_buffer_tmp);
       free(cmd_buffer_tmp); //Free the allocated memory
       
       
@@ -445,18 +370,15 @@ int main()
       }
       switch (ser_motor_L_R_char) {
         case 'A':
-          TxData('A');
           
           SET_L_dir_duty(m_direction, ser_motor_duty);
           SET_R_dir_duty(m_direction, ser_motor_duty);
           
           break;
         case 'R':
-        TxData('R');
           SET_R_dir_duty(m_direction, ser_motor_duty);
           break;
         case 'L':
-        TxData('L');
           SET_L_dir_duty(m_direction, ser_motor_duty);
           break;
         default:
